@@ -28,6 +28,32 @@ class blockchain:
             print("Data :",block.data)
             print("Hash :",block.hash)
             print("Previous Hash :",block.previous_hash)
+    
+    # Duplicate vote prevention
+    def is_voter_voted(self, voter_id):
+        for block in self.chain:
+            if voter_id in block.data:
+                return True
+        return False 
+
+    def count_votes(self):
+        result={}
+
+        for block in self.chain:
+            data=block.data
+            print("DATA:",data)
+
+            if "voted for" in data:
+                parts=data.split("voted for")
+                if len(parts)>1:
+                    candidate=parts[1].strip()
+                    print("EXTRACTED :",candidate)
+                    if candidate in result:
+                        result[candidate]+=1
+                    else:
+                        result[candidate]=1
+        print("RESULT :",result)
+        return result
 
 if __name__=="__main__":
     blockchain=blockchain()
