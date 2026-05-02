@@ -6,22 +6,40 @@
     </head>
     <body class="bg-light">
         <div class="container mt-5">
-            <div class="card p-4 shadow">
-                <h2 class="text-center mb-4">Cast your vote</h2>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Voter ID :</label><br>
-                        <input type="text" name="voter_id" class="form-control" required>
+            <div class="card p-4 shadow col-md-6 mx-auto text-center">
+                {% if success %}
+                <div class="py-4">
+                    <div class="display-1 text-success mb-3">✓</div>
+                    <h2 class="mb-3">Thank You!</h2>
+                    <p class="lead">Your vote for <strong>{{ candidate }}</strong> has been securely added to the blockchain.</p>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="/" class="btn btn-primary">Back to Home</a>
+                        <a href="/results" class="btn btn-outline-secondary">View Live Results</a>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Select Candidate</label>
-                        <select name="candidate" class="form-select">
-                            <option value="Candidate A">Candidate A</option>
-                            <option value="Candidate B">Candidate B</option>
+                </div>
+
+                {% elif has_voted == 1 %}
+                <div class="py-4">
+                    <h3 class="text-warning">Access Denied</h3>
+                    <p>Our records show you have already cast your vote.</p>
+                    <a href="/" class="btn btn-secondary">Home</a>
+                </div>
+
+                {% else %}
+                <h2 class="mb-4">Cast Your Vote</h2>
+                <form method="POST">
+                    <div class="mb-4 text-start">
+                        <label class="form-label fw-bold">Select Candidate:</label>
+                        <select name="candidate" class="form-select form-select-lg" required>
+                            {% for c in candidates %}
+                            <option value="{{ c }}">{{ c }}</option>
+                            {% endfor %}
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Submit Vote</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Submit Vote</button>
                 </form>
+                {% endif %}
             </div>
         </div>
     </body>

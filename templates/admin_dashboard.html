@@ -25,8 +25,8 @@
             <h1>Blockchain E-Voting System</h1>
             <p>Admin Panel</p>
             <div class="bg-white text-dark p-3 rounded mb-4">
-                <button class="btn btn-info btn-round">Analytics</button>
-                <button class="btn btn-warning btn-round">Manage Election</button>
+                <a href="/analytics" class="btn btn-info btn-round">Analytics</a>
+                <a href="/manage_election" class="btn btn-warning btn-round">Manage Election</a>
                 <a href="/logout" class="btn btn-danger btn-round">Logout</a>
             </div>
             <div class="row g-4">
@@ -41,14 +41,19 @@
                     <div class="card text-dark">
                         <h5>Blockchain</h5>
                         <p>Validate blockchain integrity</p>
-                        <a href="#" class="btn btn-primary">Validate</a>
+                        <a href="/validate" class="btn btn-primary">Validate Integrity</a>
                     </div>
-                </div>
+                </div> 
                 <div class="col-md-4">
                     <div class="card text-dark">
                         <h5>Manage Candidates</h5>
                         <p>Add or remove candidates</p>
-                        <a href="#" class="btn btn-primary">Admin Panel</a>
+                        <a href="/manage_candidates" class="btn btn-primary">Manage Candidates</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-dark">
+                        <a href="/upload_voters" class="btn btn-success btn-round">Upload Voters</a>
                     </div>
                 </div>
             </div>
