@@ -3,6 +3,7 @@ from blockchain import blockchain
 from datetime import datetime
 from database import create_tables
 import sqlite3
+from werkzeug.utils import secure_filename
 import csv
 import os
 
@@ -73,7 +74,6 @@ def register():
         return redirect('/register') 
     return render_template('register.html')
 
-    
 @app.route('/admin_login',methods=['GET','POST'])
 def admin_login():
     if request.method=='POST':
@@ -91,25 +91,62 @@ def admin_login():
             return render_template('admin_login.html', error="Invalid credentials !")
     return render_template('admin_login.html')
 
-@app.route('/voter_login', methods=['GET','POST'])
-def voter_login():
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
     if request.method == 'POST':
         voter_id = request.form['voter_id']
-        password = request.form['password']
+        aadhar = request.form['aadhar']
+        dob = request.form['dob']
+        new_password = request.form['new_password']
+
         conn = sqlite3.connect("evoting.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM voters WHERE voter_id=? AND password=?", (voter_id, password))
+        
+        # Check if Voter ID, Aadhaar, and DOB match
+        cursor.execute("SELECT * FROM voters WHERE voter_id=? AND aadhar=? AND dob=?", (voter_id, aadhar, dob))
         voter = cursor.fetchone()
-        conn.close()
+
         if voter:
+            # If match found, update the password
+            cursor.execute("UPDATE voters SET password=? WHERE voter_id=?", (new_password, voter_id))
+            conn.commit()
+            conn.close()
+            return render_template('voter_login.html', alert_msg="Password reset successful! Please login.")
+        else:
+            conn.close()
+            return render_template('forgot_password.html', alert_msg="Identity verification failed! Details do not match.")
+
+    return render_template('forgot_password.html')
+
+@app.route('/voter_login', methods=['GET','POST'])
+def voter_login():
+    conn = sqlite3.connect("evoting.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT phase FROM election_settings")
+    result= cursor.fetchone()
+    phase = result[0] if result else "Setup"
+    conn.close()
+    if request.method == 'POST':
+        voter_id = request.form['voter_id']
+        password = request.form['password']        
+        conn = sqlite3.connect("evoting.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT password FROM voters WHERE voter_id=?", (voter_id,))
+        result = cursor.fetchone()        
+        conn.close()
+        if not result:
+            return render_template('voter_login.html', alert_msg="Voter ID not found!", next_url="/")
+        if result[0] is None:
+            return render_template('voter_login.html', alert_msg="Authorized but not registered. Please register first!", next_url="/register")
+        if result[0] == password:
             session['voter'] = voter_id
             return redirect('/vote')
         else:
-            return render_template('voter_login.html', error="Invalid credentials!")
-
+            return render_template('voter_login.html', alert_msg="Incorrect password!")
+        pass
     return render_template('voter_login.html')
 
-
+    
 @app.route('/vote', methods=['GET', 'POST'])
 def vote():
     if not session.get('voter'):
@@ -147,11 +184,14 @@ def vote():
         conn.commit()
         conn.close()
         return render_template('vote.html', success=True, candidate=candidate)
-    cursor.execute("SELECT candidate_name FROM candidates")
-    candidates = [row[0] for row in cursor.fetchall()]
+    cursor.execute("SELECT candidate_name, candidate_sign FROM candidates")
+    candidates = cursor.fetchall() 
     conn.close()    
     return render_template('vote.html', candidates=candidates, has_voted=has_voted)
 
+# Define where to save images
+UPLOAD_FOLDER = 'uploads/symbols/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/manage_candidates', methods=['GET', 'POST'])
 def manage_candidates():
@@ -160,16 +200,19 @@ def manage_candidates():
     
     conn = sqlite3.connect("evoting.db")
     cursor = conn.cursor()
-
     if request.method == 'POST':
-        new_candidate = request.form.get('candidate_name')
-        if new_candidate:
-            cursor.execute("INSERT INTO candidates (candidate_name) VALUES (?)", (new_candidate,))
+        name = request.form.get('candidate_name')
+        file = request.files.get('candidate_sign')
+        
+        if name and file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            cursor.execute("INSERT INTO candidates (candidate_name, candidate_sign) VALUES (?, ?)", (name, filename))
             conn.commit()
-            flash(f"Candidate '{new_candidate}' added successfully!", "success")
+            flash("Candidate and Sign added!", "success")
         return redirect('/manage_candidates')
 
-    # Fetch all candidates to display in a list
     cursor.execute("SELECT * FROM candidates")
     candidates = cursor.fetchall()
     conn.close()

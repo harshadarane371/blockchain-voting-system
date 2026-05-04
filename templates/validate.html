@@ -15,16 +15,11 @@
             <h2>Blockchain Integrity Audit</h2>
            <!-- <a href="/admin_dashboard" class="btn btn-secondary">Back</a>-->
         </div>
-
-        <!-- Status Summary -->
         <div class="alert {% if valid %}alert-success{% else %}alert-danger{% endif %} shadow-sm">
             <h4 class="alert-heading">Status: {% if valid %}SECURE{% else %}CORRUPTED{% endif %}</h4>
             <p class="mb-0">{% for msg in messages %}{{ msg }}{% endfor %}</p>
         </div>
-
         <hr>
-
-        <!-- The Chain Visualization -->
         <div class="row">
             <div class="col-md-10 mx-auto">
                 {% for block in chain %}
@@ -32,8 +27,16 @@
                         <div class="card-body">
                             <h5 class="card-title">Block #{{ block.index }} <span class="badge bg-secondary float-end">{{ block.timestamp }}</span></h5>
                             <div class="row mt-3">
-                                <div class="col-sm-3 fw-bold">Data:</div>
-                                <div class="col-sm-9 text-primary">{{ block.data }}</div>
+                                <div class="col-sm-3 fw-bold">Data</div>
+                                <div class="col-sm-9 text-primary">
+                                    {% if block.data is mapping %}
+                                    Vote for: <strong>{{ block.data.candidate }}</strong> 
+                                    <br>
+                                    <small class="text-muted">Voter: V*** (Hidden for Privacy)</small>
+                                    {% else %}
+                                    {{ block.data }}
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-3 fw-bold">Previous Hash:</div>
@@ -44,17 +47,24 @@
                                 <div class="col-sm-9 hash-text fw-bold text-dark">{{ block.hash }}</div>
                             </div>
                         </div>
-                    </div>
-                    
+                    </div>  
                     {% if not loop.last %}
                         <div class="link-icon">⬇</div>
                     {% endif %}
                 {% endfor %}
             </div>
             <div class="text-center mt-4 mb-5">
-                <a href="/admin_dashboard" class="btn btn-secondary">Back to Dashboard</a>
+                {% if session.get('admin') %}
+                <a href="/admin_dashboard" class="btn btn-secondary">Back to Admin Dashboard</a>
+                {% elif session.get('voter') %}
+                <a href="/vote" class="btn btn-secondary">Back to Voting Page</a>
+                <a href="/" class="btn btn-secondary">Back to Home</a>
+                {% else %}
+                <a href="/" class="btn btn-secondary">Back to Home</a>
+                {% endif %}
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

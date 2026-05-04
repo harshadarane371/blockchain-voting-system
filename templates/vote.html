@@ -3,6 +3,12 @@
     <head>
         <title>Vote</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+        .btn-check:checked + .btn-outline-primary {
+            background-color: #0d6efd;
+            color: white;
+        }
+        </style>
     </head>
     <body class="bg-light">
         <div class="container mt-5">
@@ -18,29 +24,33 @@
                         <a href="/results" class="btn btn-outline-secondary">View Live Results</a>
                     </div>
                 </div>
-
                 {% elif has_voted == 1 %}
                 <div class="py-4">
                     <h3 class="text-warning">Access Denied</h3>
                     <p>Our records show you have already cast your vote.</p>
                     <a href="/" class="btn btn-secondary">Home</a>
                 </div>
-
                 {% else %}
                 <h2 class="mb-4">Cast Your Vote</h2>
                 <form method="POST">
-                    <div class="mb-4 text-start">
-                        <label class="form-label fw-bold">Select Candidate:</label>
-                        <select name="candidate" class="form-select form-select-lg" required>
-                            {% for c in candidates %}
-                            <option value="{{ c }}">{{ c }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="row">
+                        {% for name, sign in candidates %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-3 text-center border-2">
+                                <img src="{{ url_for('static', filename='uploads/symbols/' + sign) }}" 
+                                class="mx-auto mb-2" style="width: 100px; height: 100px; object-fit: contain;">
+                                <h5>{{ name }}</h5>
+                                <input type="radio" name="candidate" value="{{ name }}" id="{{ name }}" class="btn-check" required>
+                                <label class="btn btn-outline-primary" for="{{ name }}">Select {{ name }}</label>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg w-100">Submit Vote</button>
+                    <button type="submit" class="btn btn-success btn-lg w-100 mt-4">Submit Vote</button>
                 </form>
                 {% endif %}
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

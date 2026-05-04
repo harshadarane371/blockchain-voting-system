@@ -19,11 +19,11 @@ def create_tables():
     )
     """)
 
-    # Candidates table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS candidates (
+    # In database.py -> create_tables()
+    cursor.execute(""" CREATE TABLE IF NOT EXISTS candidates (
         candidate_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        candidate_name TEXT
+        candidate_name TEXT,
+        candidate_sign TEXT  
     )
     """)
 
@@ -47,6 +47,10 @@ def create_tables():
     cursor.execute("SELECT * FROM election_settings")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO election_settings VALUES ('Setup', '', '')")
+
+    
+    
+
 
     # Blockchain table
     cursor.execute("""
