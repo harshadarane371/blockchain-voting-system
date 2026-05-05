@@ -17,6 +17,23 @@ blockchain=blockchain()
 def home():
     return render_template('index.html')
 
+@app.route('/help')
+def help_page():
+    return render_template('help.html')
+
+# This makes 'election_phase' available in every HTML file automatically
+@app.context_processor
+def inject_status():
+    try:
+        conn = sqlite3.connect("evoting.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT phase FROM election_settings")
+        res = cursor.fetchone()
+        conn.close()
+        return dict(election_phase=res[0] if res else "Setup")
+    except:
+        return dict(election_phase="Setup")
+
 @app.route('/upload_voters', methods=['GET','POST'])
 def upload_voters():
     if not session.get('admin'):

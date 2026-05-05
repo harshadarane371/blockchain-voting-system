@@ -25,6 +25,40 @@
         </style>
     </head>
     <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-2">
+            <div class="container">
+                <!-- Logo and Brand -->
+                 <a class="navbar-brand d-flex align-items-center" href="/">
+                    <span class="me-2">🗳️</span> <!-- You can replace this emoji with an <img> tag later -->
+                    <span class="fw-bold" style="letter-spacing: 1px;">SECUREVOTE</span>
+                </a>
+                <!-- Middle: Election Status Badge -->
+                 <div class="navbar-nav mx-auto">
+                    {% if election_phase == 'Active' %}
+                    <span class="badge rounded-pill bg-success px-3">● Voting Live</span>
+                    {% elif election_phase == 'Closed' %}
+                    <span class="badge rounded-pill bg-danger px-3">● Election Closed</span>
+                    {% else %}
+                    <span class="badge rounded-pill bg-warning text-dark px-3">● Phase: {{ election_phase }}</span>
+                    {% endif %}
+                </div>
+                <!-- Right: Links -->
+                 <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') or session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+        <!-- Navbar End -->
         <div class="container text-center mt-5">
             <h1 class="mb-3">Blockchain E-Voting System</h1>
             <p>Secure, transparent, and decentralized voting powered by blockchain technology</p>
