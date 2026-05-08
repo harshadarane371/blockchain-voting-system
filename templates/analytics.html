@@ -4,6 +4,7 @@
     <title>Election Analytics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .chart-container { position: relative; height: 300px; width: 100%; }
         body { background-color: #f8f9fa; }
@@ -27,7 +28,52 @@
                     <span class="badge rounded-pill bg-warning text-dark px-3">● Phase: {{ election_phase }}</span>
                     {% endif %}
                 </div>
-                <!-- Right: Links -->
+
+                <ul class="navbar-nav align-items-center ms-auto">
+                    {% if session.get('admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_dashboard">Dashboard</a>
+                    </li>
+                    {% elif session.get('voter') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vote">Voting page</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    {% endif %}
+                    <!-- <li class="nav-item"><a class="nav-link" href="/">Home</a></li> -->
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') %}
+                    <!-- VOTER PROFILE IN NAVBAR -->
+                     <li class="nav-item ms-lg-3 d-flex align-items-center">
+                        <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
+                            👤
+                        </div>
+                        <div class="d-flex flex-column line-height-1">
+                            <span class="text-white small fw-bold" style="line-height: 1;">{{ current_user_name }}</span>
+                            <span class="text-white-50" style="font-size: 0.7rem;">ID: {{ current_voter_id }}</span>
+                        </div>
+                        <a class="btn btn-sm btn-outline-danger ms-3" href="/logout">Logout</a>
+                    </li>
+                    {% elif session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <span class="text-info me-2 small">🛡️ Admin Mode</span>
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+
+                <!-- Right: Links 
                  <ul class="navbar-nav align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/admin_dashboard">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
@@ -40,12 +86,13 @@
                         <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
                     </li>
                     {% endif %}
-                </ul>
+                </ul> -->
             </div>
         </nav>
     <div class="container mt-5">
+        <h1 class="text-center"> Election Analytics</h1>
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>📊 Election Analytics</h3>
+            
             <!--<a href="/admin_dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>-->
         </div>
 

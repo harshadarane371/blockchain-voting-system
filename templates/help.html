@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Help & FAQ - SecureVote</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .help-card { border-radius: 15px; padding:30px; border: none; }
+        .accordion-button:not(.collapsed) { background-color: #e7f1ff; color: #0d6efd; }
+        .phase-tag { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-2">
+            <div class="container">
+                <!-- Logo and Brand -->
+                 <a class="navbar-brand d-flex align-items-center" href="/">
+                    <span class="me-2">🗳️</span> <!-- You can replace this emoji with an <img> tag later -->
+                    <span class="fw-bold" style="letter-spacing: 1px;">SECUREVOTE</span>
+                </a>
+                <!-- Middle: Election Status Badge -->
+                 <div class="navbar-nav mx-auto">
+                    {% if election_phase == 'Active' %}
+                    <span class="badge rounded-pill bg-success px-3">● Voting Live</span>
+                    {% elif election_phase == 'Closed' %}
+                    <span class="badge rounded-pill bg-danger px-3">● Election Closed</span>
+                    {% else %}
+                    <span class="badge rounded-pill bg-warning text-dark px-3">● Phase: {{ election_phase }}</span>
+                    {% endif %}
+                </div>
+
+                <ul class="navbar-nav align-items-center ms-auto">
+                    {% if session.get('admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_dashboard">Dashboard</a>
+                    </li>
+                    {% elif session.get('voter') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vote">Voting page</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    {% endif %}
+                    <!-- <li class="nav-item"><a class="nav-link" href="/">Home</a></li> -->
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') %}
+                    <!-- VOTER PROFILE IN NAVBAR -->
+                     <li class="nav-item ms-lg-3 d-flex align-items-center">
+                        <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
+                            👤
+                        </div>
+                        <div class="d-flex flex-column line-height-1">
+                            <span class="text-white small fw-bold" style="line-height: 1;">{{ current_user_name }}</span>
+                            <span class="text-white-50" style="font-size: 0.7rem;">ID: {{ current_voter_id }}</span>
+                        </div>
+                        <a class="btn btn-sm btn-outline-danger ms-3" href="/logout">Logout</a>
+                    </li>
+                    {% elif session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <span class="text-info me-2 small">🛡️ Admin Mode</span>
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+
+                <!-- Right: Links 
+                 <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') or session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul> -->
+            </div>
+        </nav>
+        <div class="container mt-3">
+            
+    <div class="container  py-5">
+        <h1 class="text-center mb-6">Help Center</h1>
+                <p class="text-center">Everything you need to know about the SecureVote Blockchain System</p>
+        <div class="row col-md-9 mx-auto">
+        <div class="card help-card mt-4 shadow p-6 p-md-5">
+
+            <div class="accordion" id="helpAccordion">
+                
+                <!-- Q1: Election Phases (Moved from Manage Election) -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                            🕒 What are the different Election Phases?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body text-justify">
+                            <p>The election moves through three distinct stages managed by the Administrator:</p>
+                            <ul>
+                                <li><span class="text-warning phase-tag">Setup:</span> The election is being prepared. Admins upload voter lists and candidates. <strong>Voting is disabled.</strong></li>
+                                <li><span class="text-success phase-tag">Active:</span> The election is live. Registered voters can cast their votes within the specified time window.</li>
+                                <li><span class="text-danger phase-tag">Closed:</span> Voting has ended. No more votes can be cast, and the results are finalized for public viewing.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q2: Registration & Verification -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                            🔑 How is my identity verified?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body">
+                            We use a two-step verification process. First, your <strong>Voter ID</strong> must exist in the authorized list provided by the election commission. Second, you must provide your <strong>Aadhaar Number</strong> and <strong>Date of Birth</strong> exactly as they appear in official records to register your password.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q3: Blockchain Immutability -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                            🛡️ How does Blockchain make voting secure?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body">
+                            Every vote is stored as a "Block" in a chain. Each block contains the <strong>Hash</strong> (digital fingerprint) of the previous block. If anyone tries to change a vote in the database, the "Chain" breaks, and the <strong>Validation</strong> tool will immediately detect the tampering.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q4: Privacy -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                            🕵️ Is my vote anonymous?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body">
+                            Yes. While the blockchain records that a vote was cast, we use <strong>SHA-256 hashing</strong> to mask voter identities. Your personal details are not stored alongside your choice in the public ledger, ensuring a secret ballot.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q5: Results -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                            📊 When can I see the results?
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body">
+                            Real-time analytics are available on the <strong>Results</strong> page. You can see the vote distribution and voter turnout at any time during or after the election.
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- End Accordion 
+
+            <div class="text-center mt-5">
+                <a href="/" class="btn btn-primary btn-lg px-5">Back to Home</a>
+            </div> -->
+        </div>
+        </div>
+    </div>
+
+    <!-- Required JS for Accordion to open/close -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

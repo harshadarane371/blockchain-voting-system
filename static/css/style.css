@@ -1,0 +1,36 @@
+body{
+    background: linear-gradient(to right, #b27bee, #8da9da);
+    color: white;
+}
+
+.btn-custom{
+    background-color: #bb83f7; !important;
+    color: white; !important;
+    border-radius: 20px;
+    border: 2px solid transparent !important;
+    transition: all 0.3s ease;
+}
+.btn-custom:disabled {
+    background-color: #c09fe9 !important; /* A lighter purple */
+    color: #ffffff !important;
+}
+.card{
+    border-radius: 15px;
+    text-align: center;
+    padding: 20px;
+    transition: 0.3s;
+    }
+.card:hover{
+    transform: scale(1.02);
+}
+/* 2. Fix for "Disappearing" color during/after click (Active & Focus) */
+.btn-custom:active, 
+.btn-custom:focus, 
+.btn-custom:focus-visible {
+    background-color: #8a3dd1 !important; /* Stay solid purple */
+    color: white !important;
+    /* This creates the permanent border you asked for after clicking */
+    border: 2px solid #ffffff !important; 
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.4) !important; 
+    outline: none !important;
+}

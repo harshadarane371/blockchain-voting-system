@@ -33,6 +33,19 @@ def inject_status():
         return dict(election_phase=res[0] if res else "Setup")
     except:
         return dict(election_phase="Setup")
+    
+@app.context_processor
+def inject_user_details():
+    voter_id = session.get('voter')
+    user_name = None
+    if voter_id:
+        conn = sqlite3.connect("evoting.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM voters WHERE voter_id=?", (voter_id,))
+        res = cursor.fetchone()
+        user_name = res[0] if res else None
+        conn.close()
+    return dict(current_user_name=user_name, current_voter_id=voter_id)
 
 @app.route('/upload_voters', methods=['GET','POST'])
 def upload_voters():
@@ -171,6 +184,9 @@ def vote():
     voter_id = session['voter']
     conn = sqlite3.connect("evoting.db")
     cursor = conn.cursor()
+    cursor.execute("SELECT name FROM voters WHERE voter_id=?", (voter_id,))
+    voter_record = cursor.fetchone()
+    voter_name = voter_record[0] if voter_record else "Voter"
     cursor.execute("SELECT phase, start_time, end_time FROM election_settings")
     settings = cursor.fetchone()
     phase, start_t, end_t = settings if settings else ("Setup", "", "")    
@@ -200,12 +216,14 @@ def vote():
         cursor.execute("UPDATE voters SET has_voted=1 WHERE voter_id=?", (voter_id,))
         conn.commit()
         conn.close()
-        return render_template('vote.html', success=True, candidate=candidate)
+        return render_template('vote.html', success=True, candidate=candidate, 
+                               voter_name=voter_name, voter_id=voter_id)
     cursor.execute("SELECT candidate_name, candidate_sign FROM candidates")
-    candidates = cursor.fetchall() 
-    conn.close()    
-    return render_template('vote.html', candidates=candidates, has_voted=has_voted)
-
+    candidates = cursor.fetchall()
+    conn.close()
+    return render_template('vote.html', candidates=candidates, has_voted=has_voted, 
+                           voter_name=voter_name, voter_id=voter_id)
+   
 # Define where to save images
 UPLOAD_FOLDER = 'uploads/symbols/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -319,12 +337,7 @@ def admin():
 
 @app.route('/logout')
 def logout():
-    session.pop('admin', None)
-    return redirect('/')
-
-@app.route('/voter_logout')
-def voter_logout():
-    session.pop('voter', None)
+    session.clear()
     return redirect('/')
 
 if __name__ =='__main__':

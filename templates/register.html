@@ -4,37 +4,210 @@
 <head>
     <title>Voter Registration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Ensuring the form looks good on small screens */
+        .card {
+            border-radius: 15px;
+        }
+        @media (max-width: 576px) {
+            .container { margin-top: 20px !important; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
 </head>
 <body class="bg-light">
-    <div class="container mt-5">
-        <div class="card p-4 shadow col-md-5 mx-auto">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="me-2">🗳️</span>
+                <span class="fw-bold" style="letter-spacing: 1px;">SECUREVOTE</span>
+            </a>            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav mx-auto">
+                    {% if election_phase == 'Active' %}
+                    <span class="badge rounded-pill bg-success px-3">● Voting Live</span>
+                    {% elif election_phase == 'Closed' %}
+                    <span class="badge rounded-pill bg-danger px-3">● Election Closed</span>
+                    {% else %}
+                    <span class="badge rounded-pill bg-warning text-dark px-3">● Phase: {{ election_phase }}</span>
+                    {% endif %}
+                </div>
+                <ul class="navbar-nav align-items-center ms-auto">
+                    <!--<li class="nav-item"><a class="nav-link" href="/">Home</a></li>-->
+                    {% if session.get('admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_dashboard">Dashboard</a>
+                    </li>
+                    {% elif session.get('voter') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vote">Voting page</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    
+                    {% if session.get('voter') %}
+                        <li class="nav-item ms-lg-3 d-flex align-items-center">
+                            <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
+                                👤
+                            </div>
+                            <div class="d-flex flex-column" style="line-height: 1;">
+                                <span class="text-white small fw-bold">{{ current_user_name }}</span>
+                                <span class="text-white-50" style="font-size: 0.7rem;">ID: {{ current_voter_id }}</span>
+                            </div>
+                            <a class="btn btn-sm btn-outline-danger ms-3" href="/logout">Logout</a>
+                        </li>
+                    {% elif session.get('admin') %}
+                        <li class="nav-item ms-lg-3">
+                            <span class="text-info me-2 small">🛡️ Admin Mode</span>
+                            <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-lg-3">
+                            <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+
+                <!-- Right: Links 
+                 <ul class="navbar-nav align-items-center">
+                    {% if session.get('admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_dashboard">Dashboard</a>
+                    </li>
+                    {% elif session.get('voter') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vote">Voting page</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') or session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul> -->
+            </div>
+        </nav>
+        <div class="container mt-5">
+        <h1 class="text-center mb-4">Voter Registration</h1>        
+        <!-- Responsive Grid: col-11 on mobile, col-md-8 on tablet, col-lg-5 on desktop -->
+        <div class="row justify-content-center">
+            <div class="col-11 col-md-8 col-lg-5">
+                <div class="card p-4 shadow border-0">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form method="POST" class="needs-validation" novalidate id="regForm">
+                        <!-- Voter ID -->
+                        <div class="mb-3">
+                            <input type="text" name="voter_id" placeholder="Voter ID" class="form-control" required pattern="[A-Za-z0-9]{3,20}">
+                            <div class="invalid-feedback">Please enter a valid Voter ID.</div>
                         </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            <h3 class="text-center mb-4">Voter Registration</h3>
-            <form method="POST">
-                <input type="text" name="voter_id" placeholder="Voter ID" class="form-control mb-3" required>
-                <input type="text" name="aadhar" placeholder="Aadhaar Number" class="form-control mb-3" required>
-                <input type="date" name="dob" class="form-control mb-3" required>
-                <input type="text" name="name" placeholder="Full Name" class="form-control mb-3" required>
-                <input type="password" name="password" placeholder="Password" class="form-control mb-3" required>
-                <button type="submit" class="btn btn-success w-100">Register</button>
-            </form>
-            {% if error %}
-            <p class="text-danger mt-3 text-center">{{ error }}</p>
-            {% endif %}
-            <div class="text-center mt-3">
-                <a href="/voter_login">Already registered? Login</a>
+
+                        <!-- Aadhaar -->
+                        <div class="mb-3">
+                            <input type="text" name="aadhar" placeholder="Aadhaar Number" class="form-control" required pattern="\d{12}">
+                            <div class="invalid-feedback">Aadhaar must be exactly 12 digits.</div>
+                        </div>
+
+                        <!-- DOB -->
+                        <div class="mb-3">
+                            <!--<label class="form-label small text-muted">Date of Birth (Must be 18+)</label>-->
+                            <input type="date" name="dob" id="dobInput" class="form-control" required>
+                            <div class="invalid-feedback">You must be at least 18 years old to vote.</div>
+                        </div>
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <input type="text" name="name" placeholder="Full Name" class="form-control" required pattern="[a-zA-Z\s]{3,50}">
+                            <div class="invalid-feedback">Name should contain only letters (min 3).</div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <input type="password" name="password" placeholder="Password (Min 8 chars)" class="form-control" required minlength="8">
+                            <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                        </div>
+
+                        <div class="text-center mb-3">
+                            <button type="submit" class="btn btn-custom btn-outline-dark w-50 py-2">Register</button>
+                        </div>
+                    </form>
+                 {% if error %}
+                    <p class="text-danger mt-3 text-center">{{ error }}</p>
+                    {% endif %}
+                    <div class="text-center mt-3 border-top pt-3">
+                        <a href="/voter_login" class="text-decoration-none">Already registered? Login</a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </div>  
+    <script>
+        // 1. Bootstrap 5 Validation Logic
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+
+        // 2. Custom 18+ Age Validation
+        const dobInput = document.getElementById('dobInput');
+        const today = new Date();
+        const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        
+        // Prevent picking future dates
+        dobInput.max = today.toISOString().split("T")[0];
+
+        dobInput.addEventListener('change', function() {
+            const birthDate = new Date(this.value);
+            if (birthDate > minAgeDate) {
+                // If younger than 18, set field to invalid
+                this.setCustomValidity("Invalid");
+            } else {
+                this.setCustomValidity("");
+            }
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

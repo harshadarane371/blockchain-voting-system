@@ -5,7 +5,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body{
-                background: linear-gradient(to right, #6a11cb, #2575fc);
+                background: linear-gradient(to right, #a261e7, #82a1d8);
                 color: white;
             }
             .card{
@@ -18,7 +18,7 @@
                 transform: scale(1.05);
             }
             .btn-custom{
-                background-color: #6a11cb;
+                background-color: #9f57ec;
                 color: white;
                 border-radius: 20px;
             }
@@ -42,8 +42,33 @@
                     <span class="badge rounded-pill bg-warning text-dark px-3">● Phase: {{ election_phase }}</span>
                     {% endif %}
                 </div>
-                <!-- Right: Links -->
-                 <ul class="navbar-nav align-items-center">
+                <!-- Right: Links
+                <ul class="navbar-nav align-items-center ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') %}
+                     <li class="nav-item ms-lg-3 d-flex align-items-center">
+                        <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
+                            👤
+                        </div>
+                        <div class="d-flex flex-column line-height-1">
+                            <span class="text-white small fw-bold" style="line-height: 1;">{{ current_user_name }}</span>
+                            <span class="text-white-50" style="font-size: 0.7rem;">ID: {{ current_voter_id }}</span>
+                        </div>
+                        <a class="btn btn-sm btn-outline-danger ms-3" href="/logout">Logout</a>
+                    </li>
+                    {% elif session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <span class="text-info me-2 small">🛡️ Admin Mode</span>
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul> -->
+                <ul class="navbar-nav align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
                     {% if session.get('voter') or session.get('admin') %}
@@ -77,35 +102,35 @@
                     <div class="card text-dark">
                         <h5>Voter Login</h5>
                         <p>Access your voting account</p>
-                        <a href="/voter_login" class="btn btn-custom">Login</a>
+                        <a href="/voter_login" class="btn btn-custom btn btn-outline-dark">Login</a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card text-dark">
                         <h5>Register</h5>
                         <p>Create a new voter account</p>
-                        <a href="/register" class="btn btn-custom">Register</a>
+                        <a href="/register" class="btn btn-custom btn btn-outline-dark">Register</a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card text-dark">
                         <h5>View Results</h5>
                         <p>See current voting results</p>
-                        <a href="/results" class="btn btn-custom">Results</a>
+                        <a href="/results" class="btn btn-custom btn btn-outline-dark">Results</a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card text-dark">
                         <h5>Blockchain</h5>
                         <p>Validate blockchain integrity</p>
-                        <a href="/validate" class="btn btn-custom">Validate</a>
+                        <a href="/validate" class="btn btn-custom btn btn-outline-dark">Validate</a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card text-dark">
                         <h5>Admin</h5>
                         <p>Access administrative functions</p>
-                        <a href="/admin_login" class="btn btn-custom">Admin Login</a>
+                        <a href="/admin_login" class="btn btn-custom btn btn-outline-dark">Admin Login</a>
                     </div>
                 </div>
             </div>

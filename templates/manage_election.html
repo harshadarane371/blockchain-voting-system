@@ -3,6 +3,7 @@
 <head>
     <title>Manage Election</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body { background-color: #f8f9fa; }
         .card { border-radius: 15px; padding: 30px; border: none; }
@@ -27,7 +28,52 @@
                     <span class="badge rounded-pill bg-warning text-dark px-3">● Phase: {{ election_phase }}</span>
                     {% endif %}
                 </div>
-                <!-- Right: Links -->
+
+                <ul class="navbar-nav align-items-center ms-auto">
+                    {% if session.get('admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_dashboard">Dashboard</a>
+                    </li>
+                    {% elif session.get('voter') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vote">Voting page</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    {% endif %}
+                    <!-- <li class="nav-item"><a class="nav-link" href="/">Home</a></li> -->
+                    <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
+                    {% if session.get('voter') %}
+                    <!-- VOTER PROFILE IN NAVBAR -->
+                     <li class="nav-item ms-lg-3 d-flex align-items-center">
+                        <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
+                            👤
+                        </div>
+                        <div class="d-flex flex-column line-height-1">
+                            <span class="text-white small fw-bold" style="line-height: 1;">{{ current_user_name }}</span>
+                            <span class="text-white-50" style="font-size: 0.7rem;">ID: {{ current_voter_id }}</span>
+                        </div>
+                        <a class="btn btn-sm btn-outline-danger ms-3" href="/logout">Logout</a>
+                    </li>
+                    {% elif session.get('admin') %}
+                    <li class="nav-item ms-lg-3">
+                        <span class="text-info me-2 small">🛡️ Admin Mode</span>
+                        <a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+
+                <!-- Right: Links 
                  <ul class="navbar-nav align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/admin_dashboard">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
@@ -40,7 +86,7 @@
                         <a class="btn btn-sm btn-primary" href="/voter_login">Login</a>
                     </li>
                     {% endif %}
-                </ul>
+                </ul> -->
             </div>
         </nav>
 <div class="container mt-5">
@@ -54,8 +100,9 @@
           {% endif %}
         {% endwith %}
 
-        <div class="card bg-dark text-white shadow">
-            <h2 class="text-center mb-4">Manage Election</h2>
+        <h1 class="text-center mb-4">Manage Election</h1>
+        <div class="card text-dark shadow">
+            
             
             <!--<div class="text-center mb-4">
                 <p class="mb-1">Current Election Phase</p>
@@ -69,30 +116,32 @@
                     <li><strong>Closed:</strong> Voting is finished. Results are locked.</li>
                 </ul>
             </div>-->
-
             <form method="POST">
-                <div class="mb-3">
-                    <label class="form-label">Set Election Phase:</label>
-                    <select name="phase" class="form-select">
-                        <option value="Setup" {% if settings[0] == 'Setup' %}selected{% endif %}>Setup</option>
-                        <option value="Active" {% if settings[0] == 'Active' %}selected{% endif %}>Active</option>
-                        <option value="Closed" {% if settings[0] == 'Closed' %}selected{% endif %}>Closed</option>
-                    </select>
+                <div class="row mb-3 align-items-center">
+                    <label class="col-md-4 text-justify fw-bold" style="font-size: large;">Set Election Phase:</label>
+                    <div class="col-md-8">
+                        <select name="phase" class="form-select">
+                            <option value="Setup" {% if settings[0] == 'Setup' %}selected{% endif %}>Setup</option>
+                            <option value="Active" {% if settings[0] == 'Active' %}selected{% endif %}>Active</option>
+                            <option value="Closed" {% if settings[0] == 'Closed' %}selected{% endif %}>Closed</option>
+                        </select>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Voting Start Time :</label>
-                    <input type="datetime-local" name="start_time" value="{{ settings[1] }}" class="form-control">
+                <div class="row mb-3 align-items-center">
+                    <label class="col-md-4 text-justify fw-bold" style="font-size: large;">Voting Start Time:</label>
+                    <div class="col-md-8">
+                        <input type="datetime-local" name="start_time" value="{{ settings[1] }}" class="form-control">
+                    </div>
                 </div>
-
-                <div class="mb-5">
-                    <label class="form-label">Voting End Time :</label>
-                    <input type="datetime-local" name="end_time" value="{{ settings[2] }}" class="form-control">
+                <div class="row mb-4 align-items-center">
+                    <label class="col-md-4 text-justify fw-bold"  style="font-size: large;">Voting End Time:</label>
+                    <div class="col-md-8">
+                        <input type="datetime-local" name="end_time" value="{{ settings[2] }}" class="form-control">
+                    </div>
                 </div>
-                <div class="text-center">
-                <button type="submit" class="btn btn-primary w-35">Update Election Settings</button>
+                <div class="text-center mt-8">
+                    <button type="submit" class="btn btn-custom btn btn-outline-dark mt-4 px-5">Update Election Settings</button>
                 </div>
-            
             </form>
         </div>
     </div>
